@@ -1,0 +1,118 @@
+1.1 Industrie 4.0 refers to the intelligent networking of machines and processes for industry with the help of information and communication technology (Plattform Industrie 4.0). In Smart manufacturing, everything is connected with the aid of wireless sensors. Some of the main features are:
+    • Industrial Internet of Things (IIoT); it is the application to the industrial area of the Internet of Things, the network of physical objects embedded with electronics, software sensors and network connectivity that enables these objects to collect and exchange data; in IIot the focus is on equipping assets, i.e. every part of the inventory, to the machine on the production line to the facilities themselves. By monitoring the state of machines and the products as they are being manufactured, a much higher resolution picture of what is happening at any particular moment can be asses in ways that would have simply been impossible in the past.
+    • Advanced Analytics; while data analytics was present already in the past, i.e. the identification of factors causing drops in efficient or defects based on on-site expert knowledge, now it has a more proactive approach that anticipates problems before they occur and promotes corrective actions ahead of time. 
+
+
+1.2 Business require assets to be running at peak efficiency and utilization to realize their return on capital investments; by default most businesses rely on corrective maintenance, where parts are replaced as and when they fail: the drawbacks are unscheduled downtime, off hours labor; at the next level, business practice preventive maintenance, i.e. maintenance actions are done at certain intervals, chosen in order to have high probabilities that no failures occur during these intervals; drawbacks are the absence of assurance that faults do not occur, high costs and the shortening component lifespans.
+Predictive maintenance (PdM), as an application of advanced analytics to big data coming from IIot, optimizes the balance between corrective and preventive maintenance by enabling just in time replacement of components, reducing unscheduled downtime ad off hours labor costs (with respect to corrective maintenance) and extending component lifespans (w.r.t. preventive maintenance). PdM is strictly linked to failure type detection (FTD), that allow the best maintenance action. A business problem can be effectively solved by PdM if:
+    • it is predictive in nature, i.e. there should be a target or an outcome to predict;
+    • there should be a clear path of actions to prevent failures when they are detected;
+    • there should be a record of the operational history of the equipment that contains both good and bad outcomes (error reports, maintenance logs of performance degradation, repair, replace logs, repairs undertaken to improve them, replacement records);
+    • the recorded history should be reflected in relevant data that is of sufficient enough quality to support the use case;
+    • there should be domain experts aware of the internal processes and practices helpings the analyst understand and interpret data.
+
+
+1.3 The failure type detection and predictive maintenance process consists of several main steps:
+    • data acquisition; determine how the data can be acquired, what kind of data are accessible, which format it takes;
+    • feature engineering; after the data is acquired, they have to be processed; the steps from the raw data to the features involve signal processing, feature extraction and feature selection;
+    • data labeling; before a data-driven approach can analyze the data from a real-world system, the approach has to learn the relation between a given input and expected output; this is usually done by analyzing and labeling historical data;
+    • modeling based on machine learning;
+    • evaluation.
+
+
+2.1 A model describes the behavior of a real-world system across its lifetime; predictive maintenance tasks need a prognosis model, i.e. a model that displays dynamic behavior; for failure detection, an analysis model is needed, i.e. a model able to analyze the current state of a real-world system. They work in the same abstract manner: the data of a real-world system has to be collected before the feature engineering is able to transform the data into a representation that the model can process; after the model has processed the data, the prognosis and analysis model outputs the results;
+Different kind of model may be defined: physical, knowledge-based (expert, fuzzy), data-driven.
+
+
+2.2 Physical models are usually realized on the basis of mathematical models: differential equations are used to specify physical processes that have an influence on the health of related components; such models are created by domain experts; after modeling a system, the resulting model has to be validated using a large set of data to verify the correct behavior. The model will produce the output value, and statistical techniques are used to define the threshold for detecting the state of the real world system.
+Considering the difficulties inherent into building a physical model with a good accuracy, given that real world systems are influenced by a lot of environmental factors that are hard to monitor and to model, high costs is the first disadvantage of this model type; secondly, they cannot be recycled for different systems or components (i.e. component specialty).
+
+
+2.3 Knowledge-based models are created by domain experts too, but the use of mathematical models is avoided; the most common technologies involving them are:
+    • expert models; they define rules expressed in the form: IF condition, THEN consequence of a result, ELSE consequence.
+        ◦ conditions describe a state of the real-world system;
+        ◦ rules can be combined with logic operators;
+      They cannot handle situations not covered in the rule-based system, which means that the real-world systems should be representable by precise (and not vague) rules; moreover, an expert model can run into a combinatorial explosion, which occurs when the number of rules dramatically increases.
+    • fuzzy logic; in this logic, every input value belongs to a fuzzy rule with a degree of membership, i.e. it describe state of a system in a continuous and overlapping manner, similarly to the state transitions in a real-world system.
+Knowledge-based models can be used in conjunction with data-driven models, to compensate their weaknesses and at the same time make sense of the seconds.
+
+
+2.4 Most approaches in recent literature to failure type detection and predictive maintenance account for data-driven models: generic models based upon statistical and learning techniques applied to data coming from the real system.
+    • In supervised learning, the most common used learning techniques for PdM, data collected in the past from a real-world system (historic data) are labeled according to its expected result (defining the training data) and then are processed by a machine learning technique.
+      
+    • Reinforcement learning is is based on a trial and error scheme and has no learning phase for historic data (i.e. they are not needed): at the beginning of the learning phase, a data driven model is defined, in respect to certain assumptions; this models creates a result, depending on the current data in the real-world system, and the machine learning algorithm asses the quality of that result and modify itself to define more successful strategies and reject the unsuccessful ones.
+       In the initial learning phase, the model response is often imprecise or wrong, possibly leading to disastrous consequences; given that the learning process must be realized under runtime condition, reinforcement learning algorithm alone are avoided; instead they are used in combination with supervised learning (as initial model to be updated with experience) or unsupervised learning (models per se very much not used unless the data labeling is unavailable).
+
+
+3.1 Data acquisition techniques collect information about a real-world system, using different sources; in most cases a FTD and PdM approach is implemented along with an existing data acquisition techniques. It is nevertheless fundamental to guarantee that the data acquired are:
+    • relevant to the problem: predicting the failure of a traction system demands more and different data w.r.t. predicting the failure of a wheel; the general recommendation is to design prediction systems about specific components rather than larger subsystems, since the latter will have more disperse data; the domain expert should help in selecting the most relevant subsets of data for the analysis;
+    • sufficient; in particular a frequently asked question is the number of failure required to train a model, which depends on the context of the problem being solved and to the data themselves; once again the guidance from the domain expert is important. 
+
+
+3.2 In FTP and PdM, there are two major data acquisition techniques:
+    • in pull-based data acquisition systems the user define a query and sends it to the data acquisition systems which will then return the matched value; these queries are realized on the basis of real-time feature and sampling intervals. The costs of energy efficiency and communication are high in real-time systems: the sensors are always on and a lot of useless (static) information is transferred.
+    • in push-based data acquisition systems, values are communicated by the data acquisition system autonomously; push data acquisition systems have had a growing significance in the recent years thanks to Iot systems (which are push-based)
+
+
+3.3 Mainly the data for FTD and PdM are gathered by machine operating conditions, logfiles and equipment metadata.
+A key assumption in PdM is that a machine’s health status degrades over time during its routine operation. Machine operating conditions data are expected to contain time-varying features that capture this aging patterns and any anomalies that lead to degradation: sensor-based streaming data of the equipment (telemetry) in operation is the most important data source; they are used to measure physical quantity like temperature, pressure, distance, velocity, mass and energy output, that they convert into electrical values (voltage, current or resistance). These are (continuous) analog signals varying over a specified range, which have to be converted in (discrete) digital signals: values are sampled at regular interval (sampling process performed by an ADC) and the resulting signal is usually an array of digital values of known range (scale factor).
+Logfiles record events of a system, representable by:
+        ◦ failure history, necessary data for learning; if generic anomalies are found, they can be defined as failures with the help of some domain knowledge;
+        ◦ maintenance/repair history; it contains details about components replaced, repair activities performed and so on; these events record degradation patterns, so the absence of these in the training data can lead to misleading model results; failure history can also be found within maintenance history as special error codes, or order dates for parts;
+Equipment metadata are features about the equipment which are important for PdM, like the model, the manufactured date, the start data of the service (i.e. the age), the location of the systems and other technical specifications. While both both machine operating conditions and logfiles are temporal data (i.e. they have timestamps for the event), machine features are generally static, but if they change over time they should also have timestamps associated with them.
+
+
+4.1 The main and initial operation after data gathering is data pre-processing, that to organize the data as a table of records, where:
+    • each row in the table represents a training instance;
+    • predictor features (independent variables) must be organized in columns;
+    • the last column(s) is usually the target(s) of the prediction (dependent variable/es).
+For temporal data from sensors (telemetry):
+    • the duration of sensor data must be divided into time units (defined in seconds, minutes, hours, day and so on);
+    • each record should belong to a time unit and should feature the features related to this time units;
+    • the time unit does not have to be the same value as the sampling interval (i.e. frequency of data collection; e.g. if the frequency is high, the data may not show any significant difference from one unit to another),
+For maintenance records; given that they usually consists of an asset identifier, a timestamp and descriptions of maintenance activities that have been performed, the latter must be transformed into categorical columns (each category descriptions uniquely maps to a specific maintenance action).
+For failure records, in cases where the equipment has multiple error codes, the domain expert should help identify the ones that are pertinent to the target variable; the schema would include: asset identifier; timestamp; failure (or failure reason – as error code).
+For machine metadata, the schema would include: asset identifier, asset feature (e.g. model, age, etc.).
+The final transformation before feature engineering is to join the above tables based on the asset identifier and timestamp; other data pre-processing steps include handling missing values and normalization of attribute values.
+
+
+4.2 The observing of a property by machine learning is called a feature: usually lot of features are observed at a time and the more independent these are from one another, the greater the effort for the machine learning approach; the set of features for a machine learning approach is called the feature vector or feature data.
+Feature engineering is a series of tasks related to designing feature sets for machine learning applications; the most important processes of feature engineering for FTD and PdM are signal processing, feature selection and feature extraction.
+
+
+4.3 Signal processing is the interpretation, generation and transformation of analog or digital signals. It uses mathematical, statistical, computational, heuristic and/or linguistic representations, formalisms, modeling techniques and algorithms.Sensor signals may be studied in the time, frequency and time-frequency domains.
+The time domain analysis can be used to extract more information considering the change of the sensor values over time: peak to peak amplitude, root mean square, variance, skewness and kurtosis; secondly, it is used to denoise a signal: noise component can be environmental or due to the sensor itself (e.g. for vibration data, a special time-domain analysis technique is the time synchronous average techinique); another technique is the filtering operation, which has minor computational costs in the frequency domain.
+Frequency domain analysis or spectral analysis gives information based on frequency characteristics that are not easily observed in the time domain, through some transformation (with techniques such as Fourier transformation, Laplace transformation, Z transformation); one of the most used transformation techniques for time discrete and finite signals is the Fast Fourier Transformation algorithm.
+The measured time domain signals are often generated by several components of a machine (e.g. each component of a rotating machine produces a single frequency), while one generally see a summation of these. Through the spectrum is possible to identify the individual sources (as frequency ranges) and moreover is possible to filter the signal (which in the time domain causes convolution, while in frequency domain is simply a multiplication; then is transformed back to the time domain). The basic assumption of frequency domain analysis is that the (frequency component of the) signal is stationary; time-frequency domain analysis deals with non-stationary signals whose frequency content changes over time (in many FTP and PdM approaches, an upcoming failure is detected as a changing frequency over time); several time-frequency analysis techniques have been developed and applied to machinery fault diagnosis.
+
+
+4.4 After data acquisition and the (optional) signal processing, all features of the real-world system are available, but some information may be not easily apparent in the available feature set. Feature extraction transforms the original feature space and produce new information by combining features, with the aim of increasing the predictive power of the learning algorithm.
+For PdM, feature data from individual points of time is too noisy to be predictive; for this reason, a good practice is to apply smoothing by some aggregation function (mean, standard deviation, minimum, maximum, sum of events and so on). A lag feature is defined by the set of values derived from the application of an aggregation function along a certain time window W (both defined with some domain knowledge) to all (or part of) the initially available values of a feature; in particular, this rolling aggregate could be apply to each record (i.e. one for timestamp) or skipping value (often included as part of the aggregate of the prior lag value) at some defined rate (by 1, by 2, by 3, etc.).
+
+
+4.5 If there is a large number of features, the learning algorithm could suffer from high variance and fails in finding the fundamental functional dependence in the data; moreover, the number of feature is correlated to the time needed to train the model, which is an important resource. Feature selection has the aim to find the most influential variables for predictions and discharge the rest. After setting the maximum number of desired features, scoring by correlation finds the set of variables that are highly correlated with the output but have low correlation among themselves (using some measure of correlation like Pearson, Kendall, Spearman correlation, mutual information, Fisher score, Chi-squared association, count-based correlation and so on.).
+
+
+5.1 For supervised learning, which is the most common learning technique for FTP and PdM, historical data must be labeled, so that the learning algorithm can find the relationship between the input feature vector and the expected result.
+Among the current approaches known in literature, the following two will be considered: state-driven data labeling and residual useful lifetime.
+
+
+5.2 State-driven data-labeling is one of the most used technique because it’s able to obtain a sufficient accuracy by classification in PdM scenario and can be applied even to FTP. Given a prediction window (to not be confused by the time window of feature engineering) that defines the time prior to when the system fails and the FTP/PdM approach has to know that the system is going to fail.
+    • this necessarily depends on the time needed to schedule the repair and with the possibility of recognizing a system failure (lower bound) and economic costs (upper bound: risk that the component is replaced although is still functional);
+this technique label the historic data into different states, for each component which may be subjected to a fault:
+    • the labeling can be based on failure type states, with minimum number of states equal to 2 (normal and failure); one component can have more failure types, some of which could depend on a failure occurred before.
+      Considering a number of states equal to 1 (binary classification problem), the model answer the question “What is the probability that the component will fail in the next X units of time?”, where X is defined by the prediction window. In this case, X records prior to the failure of an asset is labeled as “about to fail” (label = 1) and all the other records as being “normal” (label = 0).
+      considering a number of states greater than 1 (multi-class classification), the question here is: “What is the probability that the component will fail in the next X units of time due to the failure type state?”; in this case, it is necessary to label X records prior to the failure of a component as “about to fail due to cause” (label=) and label all other records as being “normal” (label = 0).
+    • the labeling can be based on lifetime state (with a minimum of two: <100% and 100%), usually equally distributed over the lifetime of a component;
+      the states of failure type and lifetime can be combined into a more complex model: such a model shows which failure can occur at which lifetime, which could be helpful in scheduling maintenance actions.
+
+
+5.3 Residual Useful lifetime (RUL) is defined as the amount of time that an asset is operational before the next failure occurs. The RUL prediction is a regression problem only relevant in PdM scenarios: “Given a certain point in time, what is the RUL of the component?”; it returns one continuous value.
+Each record prior to the failure is labeled with a continuous measure “number of units of time (Y, defined in ms, second, minute, ...) before the next failure”.
+This approach has a lower accuracy with respect of state-driven data labeling techniques (it is easier to classify a discrete number of states, usually not more than ten).
+
+
+6.1 A machine learning approach tries to identify the relationship between an input vector and a result; it can be summarized by a function, to be learned from the training data, that maps input variables to output variables. In recent years, machine learning has become increasingly important in PdM due to the huge number of data available and decreasing computational costs. The most common approach is supervised learning, where the labeling techniques plays a central role.
+Between the two categories of ML approaches, parametric and non-parametric, the first one, which makes the assumption that the samples are distributed according to a known model, is not much used in PdM e FTP due the non-linearity, noises, uncertain physical parameters or incomplete knowledge of the real-world systems behind them (for which is hard to make assumption about theirs distribution). Non-parametric machine learning techniques have more stable results than the parametric ones; in particular, some of the most used for FTD and PdM to classify the state of the real-world system (so not for RUL) are decision tree, random forest, and gradient boosting.
+    • No approaches found in literature combine FTD and PdM in a unique decision tree: they are implemented separately, i.e. with a tree identifying the state of the system as well as any failure in the near future and another identifying the type of the upcoming failure.
+
