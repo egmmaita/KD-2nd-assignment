@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Apr 29 21:31:21 2021
+Created on Fri Apr 30 08:18:19 2021
 
 @author: Uni361004
 """
@@ -12,6 +12,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn; cudnn.benchmark = True
 
+data_path = "C:\\Users\\emanu\\Desktop\\data"
+
+
 with open("pdm.txt") as f:
     text = f.read()
     
@@ -20,12 +23,12 @@ token_dict = {".": "|fullstop|",
               ":":"|semicolumn|",
               "/" : "|backlash|",
               "\'" : "|accent|",
-              "-" : "|dash|",
-              "–" : "|dash2|",
+           #   "-" : "|dash|",
+            #  "–" : "|dash2|",
               "=" : "|equal|",
               "%" : "|percentage|",
-              "“": "|quoteopen|",
-              "”" : "|quoteclosed|",
+            #  "“": "|quoteopen|",
+             # "”" : "|quoteclosed|",
               ";": "|semicolon|",
               "!": "|exclamation|",
               "?": "|question|",
