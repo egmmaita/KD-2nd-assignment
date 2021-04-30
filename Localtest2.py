@@ -5,30 +5,29 @@ Created on Fri Apr 30 08:18:19 2021
 @author: Uni361004
 """
 
-# Imports
+
 import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn; cudnn.benchmark = True
+import os
+from pathlib import Path
 
-data_path = "C:\\Users\\emanu\\Desktop\\data"
 
+##UNIFIED DATA TEST##
 
-with open("pdm.txt") as f:
-    text = f.read()
-    
 token_dict = {".": "|fullstop|",
               ",": "|comma|",
               ":":"|semicolumn|",
               "/" : "|backlash|",
               "\'" : "|accent|",
-           #   "-" : "|dash|",
+            #   "-" : "|dash|",
             #  "–" : "|dash2|",
               "=" : "|equal|",
               "%" : "|percentage|",
             #  "“": "|quoteopen|",
-             # "”" : "|quoteclosed|",
+              # "”" : "|quoteclosed|",
               ";": "|semicolon|",
               "!": "|exclamation|",
               "?": "|question|",
@@ -40,59 +39,157 @@ token_dict = {".": "|fullstop|",
               "◦" : "|listsymbol2|"
 }
 
-for punct, token in token_dict.items():
-    text = text.replace(punct, f' {token} ')
-    
-text_split_by_space = text.split()
-words = [word for word in text_split_by_space if len(word) > 0]  # with len(word) > 0 the remaining spaces are removed
+data_path = Path("C:\\Users\\emanu\\Desktop\\data")
+folders = sorted(os.listdir(data_path))
+first_article = True
+articles_length = []
+words = []
+for folder_name in folders:
+    folder_path = data_path/folder_name
+    folder_articles = sorted(os.listdir(folder_path))
+    for article_name in folder_articles:
+        
+        article_path = folder_path/article_name
+        with open(article_path) as f:
+            article = f.read()
+        
+        for punct, token in token_dict.items():   
+            article = article.replace(punct, f' {token} ')
+            
+        articles_length.append(len(article))
+        
+        words_in_article = [word for word in article.split() if len(word) > 0]  # with len(word) > 0 the remaining spaces are removed
+        words += words_in_article
+
+        if first_article:
+            data = article
+            first_article=False
+        else:
+            data += "\n\n\n\n" + article
+
+
 vocabulary = list(set(words)) # set removes duplicates
 vocab_to_int = {word: i for i,word in enumerate(vocabulary)}
 int_to_vocab = {i: word for i,word in enumerate(vocabulary)}
 print(f"The length of the vocabulary (number of unique words) is: {len(vocabulary)}")
 
-text_as_integers = [vocab_to_int[word] for word in text.split() if len(word) > 0]
-print(f"The total number of words is: {len(text_as_integers)}")
+numerical_data = [vocab_to_int[word] for word in data.split() if len(word) > 0]
 
-num_paragraphs = len(text.split("|newline|  |newline|")) # paragraphs are delimited by \n space \n
-print(f"The average paragraph length is: {round(len(text_as_integers)/num_paragraphs)}")  
+
+print(f"The average article length is: {round(sum(articles_length)/len(articles_length))}")  
     
 batch_seq_len = 16 # the model will be fed with batches with 16 words
-paragraph_length = 224 # set a fixed value for paragraph length, multiple of 16
-print(f"The number of mini-sequences is {round(paragraph_length/batch_seq_len)}")    
+article_length = 2800 # set a fixed value for article length, multiple of batch_seq_len
+print(f"The number of mini-sequences is {round(article_length/batch_seq_len)}")    
     
-    
-def get_batches(text_as_integers, paragraph_length, batch_size, batch_seq_len):
 
-    num_paragraphs = len(text_as_integers)//paragraph_length
-    text_targets = text_as_integers[1:] + [text_as_integers[0]]
-    paragraph_inputs = [text_as_integers[i*paragraph_length:(i+1)*paragraph_length] for i in range(num_paragraphs)]
-    paragraph_targets = [text_targets[i*paragraph_length:(i+1)*paragraph_length] for i in range(num_paragraphs)]
-    
-    # Split paragraphs into mini-sequences of length batch_seq_len
-    num_mini_sequences = paragraph_length//batch_seq_len
-    paragraph_inputs = [[paragraph[i*batch_seq_len:(i+1)*batch_seq_len] for i in range(num_mini_sequences)] for paragraph in paragraph_inputs]
-    paragraph_targets = [[paragraph[i*batch_seq_len:(i+1)*batch_seq_len] for i in range(num_mini_sequences)] for paragraph in paragraph_targets]
+# data_path = Path("C:\\Users\\emanu\\Desktop\\data")
+# folders = sorted(os.listdir(data_path))
+# data_raw = []
+# first_pass = True
+# for folder in folders:
+#       folder_dir = data_path/folder
+#       folder_articles = sorted(os.listdir(folder_dir))
+#       for file in folder_articles:
+#           file_dir = folder_dir/file
+#           with open(file_dir) as f:
+#               article = f.read()
+#           if first_pass:
+#               unified_data = article
+#               first_pass = False
+#           else:
+#              unified_data = unified_data + "\n\n\n\n" + article
+#           data_raw.append(article)
 
-    num_batch_groups = len(paragraph_inputs)//batch_size
+# unified_data[:5000]
+# print(f"Number of articles: {len(data_raw)}")
+# #------------------------------------------
+
+    
+# token_dict = {".": "|fullstop|",
+#               ",": "|comma|",
+#               ":":"|semicolumn|",
+#               "/" : "|backlash|",
+#               "\'" : "|accent|",
+#            #   "-" : "|dash|",
+#             #  "–" : "|dash2|",
+#               "=" : "|equal|",
+#               "%" : "|percentage|",
+#             #  "“": "|quoteopen|",
+#              # "”" : "|quoteclosed|",
+#               ";": "|semicolon|",
+#               "!": "|exclamation|",
+#               "?": "|question|",
+#               "(": "|leftparen|",
+#               ")": "|rightparen|",
+#               "--": "|dash|",
+#               "\n": "|newline|",
+#               "•" : "|listsymbol|",
+#               "◦" : "|listsymbol2|"
+# }
+
+# words = []
+# data = []
+# articles_length = []
+# for article in data_raw:
+#     for punct, token in token_dict.items():
+#         article = article.replace(punct, f' {token} ')
+#     data.append(article)
+#     articles_length.append(len(article))
+#     words_in_article = [word for word in article.split() if len(word) > 0]  # with len(word) > 0 the remaining spaces are removed
+#     words += words_in_article
+
+# print(f"The total number of words is: {len(words)}")
+
+# vocabulary = list(set(words)) # set removes duplicates
+# vocab_to_int = {word: i for i,word in enumerate(vocabulary)}
+# int_to_vocab = {i: word for i,word in enumerate(vocabulary)}
+# print(f"The length of the vocabulary (number of unique words) is: {len(vocabulary)}")
+
+# numerical_data = []
+# for article in data:
+#     article_as_numeric = [vocab_to_int[word] for word in article.split() if len(word) > 0]
+#     numerical_data.append(article_as_numeric)
+
+# print(f"The average article length is: {round(sum(articles_length)/len(articles_length))}")  
+    
+# batch_seq_len = 16 # the model will be fed with batches with 16 words
+# article_length = 2800 # set a fixed value for article length, multiple of batch_seq_len
+# print(f"The number of mini-sequences is {round(article_length/batch_seq_len)}")    
+    
+
+def get_batches(numerical_data, article_length, batch_size, batch_seq_len):
+
+    num_articles = len(numerical_data)//article_length
+    text_targets = numerical_data[1:] + [numerical_data[0]]
+    article_inputs = [numerical_data[i*article_length:(i+1)*article_length] for i in range(num_articles)]
+    article_targets = [text_targets[i*article_length:(i+1)*article_length] for i in range(num_articles)]
+    
+    # Split articles into mini-sequences of length batch_seq_len
+    num_mini_sequences = article_length//batch_seq_len
+    article_inputs = [[article[i*batch_seq_len:(i+1)*batch_seq_len] for i in range(num_mini_sequences)] for article in article_inputs]
+    article_targets = [[article[i*batch_seq_len:(i+1)*batch_seq_len] for i in range(num_mini_sequences)] for article in article_targets]
+
+    num_batch_groups = len(article_inputs)//batch_size
     batches = []
     
     for i in range(num_batch_groups):
 
-        group_paragraph_inputs = paragraph_inputs[i*batch_size:(i+1)*batch_size]
-        group_paragraph_targets = paragraph_targets[i*batch_size:(i+1)*batch_size]
+        group_article_inputs = article_inputs[i*batch_size:(i+1)*batch_size]
+        group_article_targets = article_targets[i*batch_size:(i+1)*batch_size]
 
         for j in range(num_mini_sequences):
             reset_state = (j == 0)
-            batch_inputs = torch.LongTensor([group_paragraph_inputs[k][j] for k in range(batch_size)])
-            batch_targets = torch.LongTensor([group_paragraph_targets[k][j] for k in range(batch_size)])
+            batch_inputs = torch.LongTensor([group_article_inputs[k][j] for k in range(batch_size)])
+            batch_targets = torch.LongTensor([group_article_targets[k][j] for k in range(batch_size)])
             batches.append((reset_state, batch_inputs, batch_targets))
 
     return batches    
     
     
 batch_size = 8
-batches = get_batches(text_as_integers, paragraph_length, batch_size, batch_seq_len)
-    
+batches = get_batches(numerical_data, article_length, batch_size, batch_seq_len)
+
  # Define model
 class Model(nn.Module):
     
@@ -145,25 +242,25 @@ dev = torch.device("cuda") if torch.cuda.is_available else torch.device("cpu")
 model = model.to(dev)   
 
 
-def generate_paragraph(model, seq_len, paragraph_start):
-    # Convert punctuaction in paragraph start
+def generate_article(model, seq_len, article_start):
+    # Convert punctuaction in article start
     for punct, token in token_dict.items():
-        paragraph_start = paragraph_start.replace(punct, f' {token} ')
+        article_start = article_start.replace(punct, f' {token} ')
         
-    # Convert paragraph start text to ints
-    paragraph_start = [vocab_to_int[word] for word in paragraph_start.split(" ") if len(word) > 0]
+    # Convert article start text to ints
+    article_start = [vocab_to_int[word] for word in article_start.split(" ") if len(word) > 0]
     
     # Initialize output words/tokens
-    paragraph = paragraph_start[:]
+    article = article_start[:]
     
-    # Convert paragraph start to tensor (BxS = 1xS)
-    paragraph_start = torch.LongTensor(paragraph_start).unsqueeze_(0)
+    # Convert article start to tensor (BxS = 1xS)
+    article_start = torch.LongTensor(article_start).unsqueeze_(0)
     
-    # Process paragraph start and generate the rest of the paragraph
+    # Process article start and generate the rest of the article
     model.eval()
     model.reset_state()
-    input = paragraph_start
-    for i in range(seq_len - paragraph_start.size(1) + 1): # we include paragraph_start as one of the generation steps
+    input = article_start
+    for i in range(seq_len - article_start.size(1) + 1): # we include article_start as one of the generation steps
         # Copy input to device
         input = input.to(dev)
         # Pass to model
@@ -171,22 +268,22 @@ def generate_paragraph(model, seq_len, paragraph_start):
         # Convert to word indexes
         words = output.max(2)[1] # 1xS
         words = words[0] # S
-        # Add each word to paragraph
+        # Add each word to article
         for j in range(words.size(0)):
-            paragraph.append(words[j].item())
+            article.append(words[j].item())
         # Prepare next input
         input = torch.LongTensor([words[-1]]).unsqueeze(0) # 1xS = 1x1
         
     # Convert word indexes to text
-    paragraph = ' '.join([int_to_vocab[x] for x in paragraph])
+    article = ' '.join([int_to_vocab[x] for x in article])
     # Convert punctuation tokens to symbols
     for punct,token in token_dict.items():
-        paragraph = paragraph.replace(f"{token}", punct)
+        article = article.replace(f"{token}", punct)
         
-    return paragraph
+    return article
     
     
-generate_paragraph(model, 20, "Data")
+generate_article(model, 20, "Data")
 
 # Create optimizer
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
@@ -194,7 +291,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 # Initialize training history
 loss_history = []
 # Start training
-for epoch in range(200):
+for epoch in range(4):
     # Initialize accumulators for computing average loss/accuracy
     epoch_loss_sum = 0
     epoch_loss_cnt = 0
@@ -224,16 +321,16 @@ for epoch in range(200):
         loss.backward()
         optimizer.step()
     # Shift sequence and recompute batches
-    shift_point = random.randint(1, len(text_as_integers)-1)
-    text_as_integers = text_as_integers[:shift_point] + text_as_integers[shift_point:]
-    batches = get_batches(text_as_integers, paragraph_length, batch_size, batch_seq_len)
+    shift_point = random.randint(1, len(numerical_data)-1)
+    numerical_data = numerical_data[:shift_point] + numerical_data[shift_point:]
+    batches = get_batches(numerical_data, article_length, batch_size, batch_seq_len)
     # Epoch end - compute average epoch loss
     avg_loss = epoch_loss_sum/epoch_loss_cnt
     print(f"Epoch: {epoch+1}, loss: {epoch_loss_sum/epoch_loss_cnt:.4f}")
-    #print("Test sample:")
-    #print("---------------------------------------------------------------")
-    #print(generate_paragraph(model, paragraph_length, "The"))
-    #print("---------------------------------------------------------------")
+    print("Test sample:")
+    print("---------------------------------------------------------------")
+    print(generate_article(model, 15, "The"))
+    print("---------------------------------------------------------------")
     # Add to histories
     loss_history.append(avg_loss)
     
